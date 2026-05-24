@@ -2,7 +2,10 @@
 
 export type Metadata = Record<string, unknown>;
 
+/** `"ALL"` or chain ids: EVM numeric chain id, or Solana cluster `101` / `102` / `103`. */
 export type AllowedChains = "ALL" | number[];
+
+/** `"ALL"` or token keys `SYMBOL-chainId` (e.g. `ETH-1`, `SOL-103`, `USDC-103`). */
 export type AllowedTokens = "ALL" | string[];
 
 // ─── Enums ───────────────────────────────────────────────────────────

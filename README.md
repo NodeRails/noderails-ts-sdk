@@ -10,6 +10,7 @@ The official Node.js SDK for the [NodeRails](https://noderails.com) crypto payme
 - **Cross-runtime** — Node.js 18+, Deno, Bun
 - **Webhook verification** — HMAC-SHA256 signature checking
 - **Stripe-style API** — familiar resource-based interface
+- **Multi-chain** — EVM and Solana for one-time checkout and payment intents (see below)
 
 ## Installation
 
@@ -68,6 +69,14 @@ Keys follow the format `nr_<env>_<type>_<random>`:
 
 > **Note:** The SDK requires a secret key (`sk`). Public keys are for client-side use only.
 
+## Chains & tokens (EVM & Solana)
+
+- **EVM:** `chainId` is the usual numeric chain id (for example `1` Ethereum mainnet, `11155111` Sepolia).
+- **Solana:** NodeRails uses cluster ids **`101`** (testnet), **`102`** (devnet), and **`103`** (mainnet). Pass these as `chainId` anywhere the API accepts a chain (checkout sessions, payment intents, customer wallets, and so on).
+- **Token lists:** When you pass explicit tokens, use keys in the form **`SYMBOL-chainId`** (for example `ETH-1`, `USDC-1`, `SOL-103`, `USDC-103`). `"ALL"` means any token the gateway allows for those chains.
+
+**Subscriptions:** Recurring billing and renewals use **EVM ERC-20** flows today. **Solana** is supported for **one-time** payments (checkout sessions, payment intents, payment links), not subscription renewals.
+
 ## Resources
 
 ### Checkout Sessions
@@ -98,15 +107,24 @@ const expired = await noderails.checkoutSessions.expire('session-id');
 ### Payment Intents
 
 ```typescript
-// Create
+// Create (EVM-only example)
 const intent = await noderails.paymentIntents.create({
   amount: '100.00',
   currency: 'USD',
   captureMode: 'AUTOMATIC',
 });
 
+// Restrict chains / tokens (EVM + Solana example)
+const multiChainIntent = await noderails.paymentIntents.create({
+  amount: '50.00',
+  currency: 'USD',
+  captureMode: 'AUTOMATIC',
+  allowedChains: [1, 103], // Ethereum mainnet + Solana mainnet
+  allowedTokens: ['USDC-1', 'SOL-103', 'USDC-103'],
+});
+
 // Retrieve
-const intent = await noderails.paymentIntents.retrieve('intent-id');
+const retrievedIntent = await noderails.paymentIntents.retrieve('intent-id');
 
 // List
 const { data } = await noderails.paymentIntents.list({ status: 'CAPTURED' });
@@ -137,10 +155,16 @@ await noderails.customers.update('customer-id', { name: 'Jane Doe' });
 // List
 const { data } = await noderails.customers.list({ search: 'john' });
 
-// Add wallet
-const wallet = await noderails.customers.addWallet('customer-id', {
+// Add wallet (EVM — checksummed 0x address)
+const evmWallet = await noderails.customers.addWallet('customer-id', {
   chainId: 1,
   walletAddress: '0x...',
+});
+
+// Add wallet (Solana — base58 public key, cluster id 103 = mainnet)
+const solWallet = await noderails.customers.addWallet('customer-id', {
+  chainId: 103,
+  walletAddress: 'YourBase58SolanaAddress...',
 });
 
 // Remove wallet
@@ -192,6 +216,8 @@ await noderails.paymentLinks.delete('link-id');
 ```
 
 ### Subscriptions
+
+Recurring plans charge via **EVM ERC-20** renewals. Use Solana for **one-time** flows only.
 
 ```typescript
 // Create

@@ -22,7 +22,9 @@ export interface Customer {
 export interface CustomerWallet {
   id: string;
   customerAccountId: string;
+  /** EVM: numeric chain id (e.g. `1`). Solana clusters: `101` testnet, `102` devnet, `103` mainnet. */
   chainId: number;
+  /** EVM: `0x`-prefixed address. Solana: base58-encoded public key. */
   walletAddress: string;
   hasActiveAuthorization: boolean;
   authorizationType: string | null;
@@ -60,12 +62,14 @@ export interface CustomerUpdateParams {
   metadata?: Metadata;
 }
 
-export interface CustomerListParams extends PaginationParams {
+export interface CustomerListParams extends Pa inationParams {
   appId?: string;
   search?: string;
 }
 
 export interface CustomerAddWalletParams {
+  /** EVM: numeric chain id (e.g. `1`). Solana clusters: `101` testnet, `102` devnet, `103` mainnet. */
   chainId: number;
+  /** EVM: `0x`-prefixed address. Solana: base58-encoded public key. */
   walletAddress: string;
 }

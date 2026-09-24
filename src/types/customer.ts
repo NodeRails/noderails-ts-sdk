@@ -62,7 +62,7 @@ export interface CustomerUpdateParams {
   metadata?: Metadata;
 }
 
-export interface CustomerListParams extends Pa inationParams {
+export interface CustomerListParams extends PaginationParams {
   appId?: string;
   search?: string;
 }

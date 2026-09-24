@@ -132,8 +132,45 @@ const { data } = await noderails.paymentIntents.list({ status: 'CAPTURED' });
 // Cancel
 await noderails.paymentIntents.cancel('intent-id');
 
-// Refund
+// Refund (full leftover, or EVM partial via percent / amount)
 await noderails.paymentIntents.refund('intent-id', { reason: 'Customer request' });
+await noderails.paymentIntents.refund('intent-id', { reason: 'Partial', percent: 50 });
+await noderails.paymentIntents.refund('intent-id', { reason: 'Partial', amount: '5000000' });
+```
+
+### Payouts
+
+Standing wallet authorization and ERC-20 approve / `depositETH` happen in the merchant dashboard. The SDK creates, schedules, lists, executes, and cancels.
+
+Create amounts are **human decimals**. Stored `tokenAmount` and `lines[].amount` are **atomic** integer strings. Bulk (more than one recipient) is EVM only. Solana is native SOL, one recipient. Sui create is allowed; schedule and execute are not enabled.
+
+```typescript
+const payout = await noderails.payouts.create({
+  chain: '11155111',
+  tokenAddress: '0x...',
+  lines: [
+    { recipient: '0xAlice', amount: '100.50' },
+    { recipient: '0xBob', amount: '80' },
+  ],
+  executeNow: true,
+});
+
+await noderails.payouts.execute(payout.id);
+await noderails.payouts.cancel(payout.id);
+
+const schedule = await noderails.payoutSchedules.create({
+  chain: '11155111',
+  tokenAddress: '0x...',
+  intervalDays: 30,
+  lines: [{ recipient: '0xAlice', amount: '100.50' }],
+});
+
+await noderails.payoutContacts.create({
+  label: 'Alice',
+  wallet: '0xAlice',
+  family: 'EVM',
+});
+await noderails.payoutContacts.update('contact-id', { label: 'Alice payroll' });
 ```
 
 ### Customers

@@ -1,4 +1,10 @@
-import type { CursorPaginationParams, WebhookDeliveryStatus, WebhookEvent } from "./common";
+import type {
+  CursorPaginationParams,
+  Metadata,
+  PaymentStatus,
+  WebhookDeliveryStatus,
+  WebhookEvent,
+} from "./common";
 
 // ─── Response Types ──────────────────────────────────────────────────
 
@@ -43,4 +49,20 @@ export interface WebhookEndpointUpdateParams {
 
 export interface WebhookDeliveryListParams extends CursorPaginationParams {
   status?: WebhookDeliveryStatus;
+}
+
+/** Payload for payment.* webhook events (including payment.refunded). */
+export interface PaymentWebhookPayload {
+  event: WebhookEvent | string;
+  paymentIntentId: string;
+  externalId: string | null;
+  appId: string;
+  status: PaymentStatus;
+  amount: string;
+  currency: string;
+  settleAmount: string | null;
+  /** True only when leftover escrow is zero (`REFUNDED`). */
+  fullyRefunded: boolean;
+  metadata: Metadata;
+  createdAt: string;
 }

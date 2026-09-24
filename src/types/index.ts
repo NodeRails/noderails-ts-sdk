@@ -1,5 +1,6 @@
 export type * from "./common";
 export type * from "./checkout-session";
+export type * from "./headless-checkout";
 export type * from "./payment-intent";
 export type * from "./customer";
 export type * from "./invoice";
@@ -9,3 +10,4 @@ export type * from "./product-plan";
 export type * from "./tax-rate";
 export type * from "./webhook";
 export type * from "./price";
+export type * from "./payout";

@@ -42,7 +42,13 @@ export interface PaymentIntent {
   refundedAt: string | null;
   refundTxHash: string | null;
   refundReason: string | null;
+  /** Leftover escrow token units still in the contract (integer string). */
+  settleAmount: string | null;
+  promisedSettlementAmount?: string | null;
   platformFeeBps: number | null;
+  /** Present on retrieve / list. */
+  refunds?: PaymentRefund[];
+  transactions?: PaymentIntentTransaction[];
   expiresAt: string | null;
   sourceType: PaymentSourceType | null;
   sourceId: string | null;
@@ -75,6 +81,53 @@ export interface PaymentIntentListParams extends PaginationParams {
   status?: PaymentStatus;
 }
 
+export interface PaymentRefund {
+  id: string;
+  amount: string;
+  reason: string | null;
+  status: "PENDING" | "CONFIRMED" | "FAILED";
+  createdAt: string;
+  confirmedAt: string | null;
+  transactionId: string | null;
+}
+
+export interface PaymentIntentTransaction {
+  id: string;
+  paymentIntentId: string | null;
+  mtxmTxId: string | null;
+  txHash: string | null;
+  chain: string;
+  type: string;
+  status: "PENDING" | "CONFIRMED" | "FAILED";
+  blockNumber: number | null;
+  gasUsed: string | null;
+  error: string | null;
+  createdAt: string;
+  confirmedAt: string | null;
+}
+
 export interface PaymentIntentRefundParams {
   reason: string;
+  /**
+   * Integer string of escrow token units to refund.
+   * Omit together with `percent` to refund all leftover.
+   * Do not send with `percent`.
+   */
+  amount?: string;
+  /**
+   * Percent of current leftover (1–100).
+   * Do not send with `amount`. Partial refunds are EVM only.
+   */
+  percent?: number;
+}
+
+/** POST /payments/intents/:id/refund — submitted refund, not yet confirmed on-chain. */
+export interface PaymentIntentRefund {
+  paymentIntentId: string;
+  transactionId: string;
+  mtxmTxId: string;
+  txHash: string | null;
+  status: "PENDING";
+  amount: string;
+  leftoverAfter: string;
 }

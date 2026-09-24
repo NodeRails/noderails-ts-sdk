@@ -15,6 +15,7 @@ export type PaymentStatus =
   | "AUTHORIZED"
   | "CAPTURING"
   | "CAPTURED"
+  | "PARTIALLY_REFUNDED"
   | "SETTLED"
   | "DISPUTED"
   | "DISPUTE_RESOLVED"

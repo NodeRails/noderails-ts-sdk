@@ -2,10 +2,14 @@ import { NodeRailsError } from "./errors";
 import { HttpClient } from "./http";
 import {
   CheckoutSessions,
+  HeadlessCheckout,
   Customers,
   Invoices,
   PaymentIntents,
   PaymentLinks,
+  PayoutContacts,
+  Payouts,
+  PayoutSchedules,
   Prices,
   ProductPlans,
   Subscriptions,
@@ -61,6 +65,7 @@ export class NodeRails {
 
   // ── Resource namespaces ──
   readonly checkoutSessions: CheckoutSessions;
+  readonly headlessCheckout: HeadlessCheckout;
   readonly paymentIntents: PaymentIntents;
   readonly customers: Customers;
   readonly invoices: Invoices;
@@ -70,6 +75,9 @@ export class NodeRails {
   readonly taxRates: TaxRates;
   readonly webhookEndpoints: WebhookEndpoints;
   readonly prices: Prices;
+  readonly payouts: Payouts;
+  readonly payoutSchedules: PayoutSchedules;
+  readonly payoutContacts: PayoutContacts;
 
   /** Static webhook verification utilities. */
   static readonly webhooks = new Webhooks();
@@ -87,6 +95,7 @@ export class NodeRails {
     });
 
     this.checkoutSessions = new CheckoutSessions(http, config.appId);
+    this.headlessCheckout = new HeadlessCheckout(http, config.appId);
     this.paymentIntents = new PaymentIntents(http, config.appId);
     this.customers = new Customers(http, config.appId);
     this.invoices = new Invoices(http, config.appId);
@@ -96,6 +105,9 @@ export class NodeRails {
     this.taxRates = new TaxRates(http);
     this.webhookEndpoints = new WebhookEndpoints(http, config.appId);
     this.prices = new Prices(http);
+    this.payouts = new Payouts(http, config.appId);
+    this.payoutSchedules = new PayoutSchedules(http, config.appId);
+    this.payoutContacts = new PayoutContacts(http, config.appId);
   }
 
   private validateConfig(config: NodeRailsConfig): void {

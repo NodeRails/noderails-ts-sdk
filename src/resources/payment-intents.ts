@@ -3,6 +3,7 @@ import type {
   PaymentIntent,
   PaymentIntentCreateParams,
   PaymentIntentListParams,
+  PaymentIntentRefund,
   PaymentIntentRefundParams,
 } from "../types/payment-intent";
 
@@ -64,10 +65,21 @@ export class PaymentIntents {
   }
 
   /**
-   * Initiate a refund for a payment intent.
+   * Refund leftover escrow to the payer. Allowed while `CAPTURED` or
+   * `PARTIALLY_REFUNDED` and before the settlement timelock.
+   *
+   * Omit `amount` and `percent` to refund all leftover. Partial refunds are
+   * EVM only; Solana/Sui must refund the remaining amount in full.
+   *
+   * @example
+   * ```ts
+   * await noderails.paymentIntents.refund('intent-id', { reason: 'Customer request' });
+   * await noderails.paymentIntents.refund('intent-id', { reason: 'Partial', percent: 50 });
+   * await noderails.paymentIntents.refund('intent-id', { reason: 'Partial', amount: '5000000' });
+   * ```
    */
-  async refund(id: string, params: PaymentIntentRefundParams): Promise<PaymentIntent> {
-    return this.http.request<PaymentIntent>({
+  async refund(id: string, params: PaymentIntentRefundParams): Promise<PaymentIntentRefund> {
+    return this.http.request<PaymentIntentRefund>({
       method: "POST",
       path: `/payments/intents/${id}/refund`,
       body: params as unknown as Record<string, unknown>,

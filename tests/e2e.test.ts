@@ -6,10 +6,13 @@
  * Required environment variables:
  *   NODERAILS_API_KEY  - A secret key (nr_test_sk_...)
  *   NODERAILS_APP_ID   - Your test app UUID
- *   NODERAILS_BASE_URL - Server URL (default: http://localhost:3000)
+ *   NODERAILS_BASE_URL - Server URL (default: https://api.noderails.com)
  *
- * Run:
+ * Run against live API:
  *   NODERAILS_API_KEY=nr_test_sk_... NODERAILS_APP_ID=... npm run test:e2e
+ *
+ * Or create a `.env.test` file and run:
+ *   npm run test:e2e:live
  */
 
 import { describe, it, expect, beforeAll } from "vitest";
@@ -30,7 +33,7 @@ import type {
 
 const API_KEY = process.env.NODERAILS_API_KEY!;
 const APP_ID = process.env.NODERAILS_APP_ID!;
-const BASE_URL = process.env.NODERAILS_BASE_URL ?? "http://localhost:3000";
+const BASE_URL = process.env.NODERAILS_BASE_URL ?? "https://api.noderails.com";
 
 let sdk: NodeRails;
 
